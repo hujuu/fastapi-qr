@@ -1,9 +1,26 @@
 import requests
 import json
+from fastapi import FastAPI, HTTPException
+from typing import Optional
+from data import get_user, User
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Zipcode API"}
+
+@app.get("/user/{user_id}")
+async def read_user(user_id: int) -> dict:
+    """Retrieve user information by user ID."""
+    user: Optional[User] = get_user(user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"id": user.id, "name": user.name}
 
 url = "https://zipcloud.ibsnet.co.jp/api/search?zipcode=1060044"
 
-zip = input("Enter zipcode: ")
+zip = "1060044"
 
 param = {"zipcode": zip}
 
