@@ -2,7 +2,7 @@ import requests
 import json
 from fastapi import FastAPI, HTTPException
 from typing import Optional
-from data import get_user, User
+from data import get_user, User, get_books_by_category
 
 app = FastAPI()
 
@@ -17,6 +17,12 @@ async def read_user(user_id: int) -> dict:
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return {"id": user.id, "name": user.name}
+
+@app.get("/books/")
+async def read_books(category: Optional[str] = None) -> list[dict[str, str]]:
+    """Retrieve books, optionally filtered by category."""
+    books = get_books_by_category(category)
+    return [{"id": book.id, "title": book.title, "category": book.category} for book in books]
 
 url = "https://zipcloud.ibsnet.co.jp/api/search?zipcode=1060044"
 
